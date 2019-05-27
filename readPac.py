@@ -359,8 +359,10 @@ def getTimeCode(timeCodeIndex, byte_list):
     """Extract time code"""
 
     if timeCodeIndex > 0:
-        highPart = ord(byte_list[timeCodeIndex]) + ord(byte_list[timeCodeIndex + 1]) * 256
-        lowPart = ord(byte_list[timeCodeIndex + 2]) + ord(byte_list[timeCodeIndex + 3]) * 256
+        highPart = ord(byte_list[timeCodeIndex]) + \
+            ord(byte_list[timeCodeIndex + 1]) * 256
+        lowPart = ord(byte_list[timeCodeIndex + 2]) + \
+            ord(byte_list[timeCodeIndex + 3]) * 256
         highPart = str(highPart).zfill(6)
         lowPart = str(lowPart).zfill(6)
 
@@ -373,7 +375,9 @@ def getTimeCode(timeCodeIndex, byte_list):
 
         milliseconds = int((1000.0 / frameRate) * frames)
 
-        return TimeCode(str(hours).rjust(2,"0"), str(minutes).rjust(2,"0"), str(seconds).rjust(2,"0"), str(milliseconds).rjust(3,"0"))
+        return TimeCode(str(hours).rjust(2, "0"), str(minutes).rjust(2, "0"),
+                        str(seconds).rjust(2, "0"),
+                        str(milliseconds).rjust(3, "0"))
 
     else:
         return TimeCode(0, 0, 0, 0)
@@ -436,7 +440,7 @@ def getCyrillicString(encoding, byte_list, index):
         idx = CyrillicCodes.index(b)
         if idx >= 0:
             char = CyrillicLetters[idx]
-            #return b.decode('iso-8859-5').encode('utf-8')
+            # return b.decode('iso-8859-5').encode('utf-8')
             return char
 
         if len(byte_list) > index + 1:
@@ -444,7 +448,7 @@ def getCyrillicString(encoding, byte_list, index):
             if idx >= 0:
                 index += 1
                 char = CyrillicLetters[idx]
-                #return b.decode('iso-8859-5').encode('utf-8')
+                # return b.decode('iso-8859-5').encode('utf-8')
                 return char
     except ValueError:
         return b
@@ -496,17 +500,18 @@ def isEncoding(paragraphs, lang):
                 # chars, so if no latin_1 chars are found, assume invalid
                 # string
                 latin_1 = ''.join(c for c in text if block['start'] <= c <=
-                        block['end'])
+                                  block['end'])
                 if len(latin_1) == 0:
                     chars = ''
             else:  # All encodings except latin
-                chars = ''.join(c for c in text if block['start'] <= c <= block['end'])
+                chars = ''.join(c for c in text if block['start'] <= c <=
+                                block['end'])
 
             # Ratio of chars in unicode block
             if float(len(text)) == 0:
-                 print "Could not determine character encoding from file"
-                 sys.exit(1)
-            
+                print "Could not determine character encoding from file"
+                sys.exit(1)
+
             ratio = float(len(chars)) / float(len(text))
 
             if len(text) < len_thresh:  # For short text, must be 100% accurate
@@ -514,14 +519,14 @@ def isEncoding(paragraphs, lang):
                     isLang = True
                 else:
                     isLang = False
-                    #print 'Orig2: ', text.encode('utf-8')  # for debugging
-                    #print 'Char2: ', chars.encode('utf-8')  # for debugging
+                    # print 'Orig2: ', text.encode('utf-8')  # for debugging
+                    # print 'Char2: ', chars.encode('utf-8')  # for debugging
             else:
                 if ratio >= 0.90:
                     isLang = True
                 else:
-                    #print 'Orig: ', text.encode('utf-8')
-                    #print 'Char: ', chars.encode('utf-8')
+                    # print 'Orig: ', text.encode('utf-8')
+                    # print 'Char: ', chars.encode('utf-8')
                     isLang = False
 
             if isLang:
@@ -555,11 +560,6 @@ def getPacParagraph(index, real_bytes, codePage):
 
     feIndex = index
 
-    # Not currently used
-    #endDelimiter = '\x00'
-    #alignment = real_bytes[feIndex + 1]
-    #verticalAlignment = real_bytes[feIndex - 1]
-
     p = Paragraph()
     timeStartIndex = feIndex - 15
 
@@ -574,7 +574,8 @@ def getPacParagraph(index, real_bytes, codePage):
     else:
         return None
 
-    textLength = ord(real_bytes[timeStartIndex + 9]) + ord(real_bytes[timeStartIndex + 10]) * 256
+    textLength = ord(real_bytes[timeStartIndex + 9]) \
+        + ord(real_bytes[timeStartIndex + 10]) * 256
     maxIndex = timeStartIndex + 10 + textLength
 
     string_buffer = ''
@@ -611,7 +612,7 @@ def getPacParagraph(index, real_bytes, codePage):
             index += 2
 
         elif codePage == 'latin':
-            #latin_char = getString('utf-8', real_bytes, index)
+            # latin_char = getString('utf-8', real_bytes, index)
             latin_char = getString('iso-8859-1', real_bytes, index)
             string_buffer += latin_char
         elif codePage == 'arabic':
@@ -637,7 +638,7 @@ def getPacParagraph(index, real_bytes, codePage):
         return None
 
     p.text = normalizeText(string_buffer)
-    #p.text = string_buffer
+    # p.text = string_buffer
     return p
 
 
@@ -645,7 +646,6 @@ def rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
     return new.join(li)
 
-# From http://stackoverflow.com/questions/2556108/how-to-replace-the-last-occurence-of-an-expression-in-a-string
 
 def writeOut(paragraphs, outForm, file):
     i = 1
@@ -656,7 +656,8 @@ def writeOut(paragraphs, outForm, file):
             i += 1
         elif outForm == "SRT":
             strRtn += str(i) + "\n"
-            strRtn += rreplace(str(line.startTime),":",",",1) + " --> " + rreplace(str(line.endTime),":",",",1) + "\n"
+            strRtn += rreplace(str(line.startTime), ":", ",", 1) + \
+                " --> " + rreplace(str(line.endTime), ":", ",", 1) + "\n"
             strRtn += line.text + "\n"
             strRtn += "\n"
             i += 1
@@ -691,7 +692,7 @@ def autoDetect(subtitle_file):
             if isEncoding(paragraphs, 'chinese'):
                 return paragraphs
         if isEncoding(paragraphs, code):
-                return paragraphs
+            return paragraphs
         attempts += 1
 
     # Try UTF-8 as last resort:
@@ -699,14 +700,88 @@ def autoDetect(subtitle_file):
     return paragraphs
 
 
+def subDetect(subtitle_file):
+    """
+    Automatically detect character encoding.
+    Run through various encodings and compare decoded text with unicode
+    character blocks (using isEncoding())
+    """
+
+    encodings = ['thai', 'cyrillic', 'latin']  # DO NOT CHANGE THIS ORDER
+
+    attempts = 0
+    for code in encodings:
+        paragraphs = parseSubtitle(subtitle_file, code)
+        if attempts == 0:
+            # Chinese is detected regardless of specified encoding
+            if isEncoding(paragraphs, 'chinese'):
+                return paragraphs
+        if isEncoding(paragraphs, code):
+            return paragraphs
+        attempts += 1
+
+    # Try UTF-8 as last resort:
+    paragraphs = parseSubtitle(subtitle_file, 'utf-8')
+
+
+def srtOut(paragraphs, outForm):
+    i = 1
+    strRtn = ""
+    for line in paragraphs:
+        if outForm == "text":
+            strRtn += line.text
+            i += 1
+        elif outForm == "SRT":
+            strRtn += str(i) + "\n"
+            strRtn += rreplace(str(line.startTime), ":", ",", 1) + " --> " \
+                + rreplace(str(line.endTime), ":", ",", 1) + "\n"
+            strRtn += line.text + "\n"
+            strRtn += "\n"
+            i += 1
+        else:
+            strRtn += line
+            i += 1
+    return strRtn
+
+
+def parseSubtitle(subtitle, codePage):
+    """
+    Reads in PAC string
+    extracts text and timing information
+    """
+
+    real_bytes = []
+    for ch in subtitle:
+        real_bytes.append(ch)
+
+    index = 0
+    all_pars = []
+    while index < len(real_bytes):
+        paragraph = getPacParagraph(index, real_bytes, codePage)
+        if paragraph is not None and len(paragraph.text) > 0:
+            if len(all_pars) == 0:
+                all_pars.append(paragraph)
+            elif paragraph == all_pars[-1]:
+                pass
+            else:
+                all_pars.append(paragraph)
+        index += 1
+
+    return all_pars
+
+
 def main():
     usage = "usage: python readPac.py [options] pac_file"
-    availableOutputs = ["SRT","SRT"]
+    availableOutputs = ["SRT", "SRT"]
     parser = OptionParser(usage=usage)
-    parser.add_option("-e", "--encoding", dest="codePage",help="encoding: latin, thai, chinese, cyrillic, utf-8")
-    parser.add_option("-t", "--text", action="store_true", dest="textOnly",help="Write out text only")
-    parser.add_option("-f", "--outformat", dest="outFormat", help="Define output format, options: SRT")
-    parser.add_option("-o", "--outfile", dest="outFile", help="Output to file, specify filename")
+    parser.add_option("-e", "--encoding", dest="codePage",
+                      help="encoding: latin, thai, chinese, cyrillic, utf-8")
+    parser.add_option("-t", "--text", action="store_true",
+                      dest="textOnly", help="Write out text only")
+    parser.add_option("-f", "--outformat", dest="outFormat",
+                      help="Define output format, options: SRT")
+    parser.add_option("-o", "--outfile", dest="outFile",
+                      help="Output to file, specify filename")
     (options, args) = parser.parse_args()
     if options.outFormat.upper() not in availableOutputs:
         print "Invalid output format: " + options.outFormat
@@ -718,7 +793,7 @@ def main():
 
     subtitle_file = args[0]
     file_type = subtitle_file[-3:]
-    ###Work out encoding & Read File
+    # Work out encoding & Read File
     if options.codePage:
         codePage = options.codePage.lower()
         paragraphs = loadSubtitle(subtitle_file, codePage)
@@ -728,16 +803,15 @@ def main():
     else:
         # Auto-detecting
         paragraphs = autoDetect(subtitle_file)
-        
 
-    ##Determine outputs
-    ##print options.outFile 
+    # Determine outputs
+    # print options.outFile
     if options.textOnly:
-         writeOut(paragraphs,"text",options.outFile)
-    elif options.outFormat :
-        writeOut(paragraphs,options.outFormat,options.outFile)
-    else :
-        writeOut(paragraphs,"",options.outFile)
+        writeOut(paragraphs, "text", options.outFile)
+    elif options.outFormat:
+        writeOut(paragraphs, options.outFormat, options.outFile)
+    else:
+        writeOut(paragraphs, "", options.outFile)
 
 
 if __name__ == "__main__":
