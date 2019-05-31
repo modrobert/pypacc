@@ -39,7 +39,7 @@ import string
 import sys
 import re
 
-CyrillicLetters = [" ",  # 0x20
+CyrillicLetters = (" ",  # 0x20
                    "!",  # 0x21
                    "Э",  # 0x22
                    "/",  # 0x23
@@ -161,9 +161,9 @@ CyrillicLetters = [" ",  # 0x20
                    "ќ",  # 0xe272
                    "ѓ",  # 0xe275
                    "ї",  # 0xe596
-                   "ш"]  # 0x6938
+                   "ш")  # 0x6938
 
-CyrillicCodes = ['\x20',  # space
+CyrillicCodes = ('\x20',  # space
                  '\x21',  # !
                  '\x22',  # Э
                  '\x23',  # /
@@ -285,7 +285,7 @@ CyrillicCodes = ['\x20',  # space
                  '\xe272',  # ќ
                  '\xe275',  # ѓ
                  '\xe596',  # ї
-                 '\x6938']  # ш
+                 '\x6938')  # ш
 
 
 class Paragraph:
@@ -682,7 +682,7 @@ def autoDetect(subtitle_file):
     character blocks (using isEncoding())
     """
 
-    encodings = ['thai', 'cyrillic', 'latin']  # DO NOT CHANGE THIS ORDER
+    encodings = ('thai', 'cyrillic', 'latin')  # DO NOT CHANGE THIS ORDER
 
     attempts = 0
     for code in encodings:
@@ -707,7 +707,7 @@ def subDetect(subtitle_file):
     character blocks (using isEncoding())
     """
 
-    encodings = ['thai', 'cyrillic', 'latin']  # DO NOT CHANGE THIS ORDER
+    encodings = ('thai', 'cyrillic', 'latin')  # DO NOT CHANGE THIS ORDER
 
     attempts = 0
     for code in encodings:
@@ -722,6 +722,7 @@ def subDetect(subtitle_file):
 
     # Try UTF-8 as last resort:
     paragraphs = parseSubtitle(subtitle_file, 'utf-8')
+    return paragraphs
 
 
 def srtOut(paragraphs, outForm):
