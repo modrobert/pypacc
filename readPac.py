@@ -338,7 +338,14 @@ def loadSubtitle(subtitle_file, codePage):
                 pass
             else:
                 all_pars.append(paragraph)
-        index += 1
+            # speed patch to reduce useless loops with a factor of 28
+            try:
+                # adding the number of utf-8 chars, not bytes
+                index += len(paragraph.text.decode('utf-8'))
+            except UnicodeDecodeError:
+                index += 1
+        else:
+            index += 1
 
     return all_pars
 
@@ -778,7 +785,7 @@ def parseSubtitle(subtitle, codePage):
                 pass
             else:
                 all_pars.append(paragraph)
-            # speed patch to reduce useless loops
+            # speed patch to reduce useless loops with a factor of 28
             try:
                 # adding the number of utf-8 chars, not bytes
                 index += len(paragraph.text.decode('utf-8'))
