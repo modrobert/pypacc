@@ -37,6 +37,7 @@
 from optparse import OptionParser
 import string
 import sys
+import os
 import re
 
 CyrillicLetters = (" ",  # 0x20
@@ -401,10 +402,21 @@ def getString(encoding, byte_list, index):
     """
 
     byte = byte_list[index]
+    # IBM Code Page 874: 0x7f - 0x9f gap offset patch
+    if encoding == 'cp874':
+        if byte >= chr(0x7f) and byte <= chr(0x9f):
+            byte = chr(ord(byte) + 0x60)
     try:
         char = ''.join(byte).decode(encoding)
     except UnicodeDecodeError:
+        if os.environ.get('STRING_DEBUG') >= '1':
+            sys.stderr.write("debug exception: byte {}, index {}\n"
+                             .format(hex(ord(byte)), index))
         char = ''
+    if os.environ.get('STRING_DEBUG') >= '2':
+        sys.stderr.write("debug success: byte {}, index {}, char {}  {}\n"
+                         .format(hex(ord(byte)), index, repr(char),
+                                 char.encode('utf-8')))
     return char.encode('utf-8')
 
 
@@ -766,7 +778,14 @@ def parseSubtitle(subtitle, codePage):
                 pass
             else:
                 all_pars.append(paragraph)
-        index += 1
+            # speed patch to reduce useless loops
+            try:
+                # adding the number of utf-8 chars, not bytes
+                index += len(paragraph.text.decode('utf-8'))
+            except UnicodeDecodeError:
+                index += 1
+        else:
+            index += 1
 
     return all_pars
 
