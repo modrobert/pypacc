@@ -35,6 +35,10 @@ Author(s)
 - Nikolaj Olsson
     - wrote the PAC decoding logic
 
+- modrobert
+    - reduced the number of loops for getPacParagraph() with a factor of 28
+    - added cp874 0x7f - 0x9f gap offset patch
+    - added some functions so readPac.py can be used as a library
 
 Information
 ===========
